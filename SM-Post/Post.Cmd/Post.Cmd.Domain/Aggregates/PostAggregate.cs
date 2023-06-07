@@ -25,7 +25,7 @@ namespace Post.Cmd.Domain.Aggregates
         }
         public PostAggregate(Guid id, string author, string message)
         {
-            //command handler method that also raises an event
+            //command handler method that raises an event
             RaiseEvent(new PostCreatedEvent()
             {
                 Id = id,

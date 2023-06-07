@@ -14,6 +14,7 @@ namespace Post.Cmd.Api.Commands
 
         public async Task HandleAsync(NewPostCommand command)
         {
+            //create new aggregate >> raise event
             PostAggregate aggregate = new PostAggregate(
                 command.Id, //commandID targets the aggregateID
                 command.Author,

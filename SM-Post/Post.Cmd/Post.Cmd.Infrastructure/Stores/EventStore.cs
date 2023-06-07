@@ -1,7 +1,7 @@
-﻿using CQRS.Core.Domain;
-using CQRS.Core.Events;
+﻿using CQRS.Core.Events;
 using CQRS.Core.Exceptions;
 using CQRS.Core.Infrastructure;
+using CQRS.Core.Producers;
 using Post.Cmd.Domain.Aggregates;
 using System;
 using System.Collections.Generic;
@@ -15,18 +15,23 @@ namespace Post.Cmd.Infrastructure.Stores
     public class EventStore : IEventStore
     {
         private readonly IEventStoreRepository _eventStoreRepo;
-        public EventStore(IEventStoreRepository eventStoreRepo)
+        private readonly IEventProducer _eventProducer;
+
+
+        public EventStore(IEventStoreRepository eventStoreRepo, IEventProducer eventProducer)
         {
             _eventStoreRepo = eventStoreRepo;
+            _eventProducer = eventProducer;
         }
         public async Task<List<BaseEvent>> GetEventsAsync(Guid aggregateId)
         {
+            //get events for replaying
             var eventStream = await _eventStoreRepo.FindByAggregateID(aggregateId);
             if (eventStream == null || !eventStream.Any())
             {
                 throw new AggregateNotFoundException("incorrect post id provided");
             }
-            return eventStream.OrderBy(x => x.Version).Select(e => e.Data).ToList();
+            return eventStream.OrderBy(x => x.Version).Select(e => e.EventData).ToList();
         }
 
         public async Task SaveEventsAsync(Guid aggregateId, IEnumerable<BaseEvent> events, int expectedVersion)
@@ -37,9 +42,11 @@ namespace Post.Cmd.Infrastructure.Stores
             if (expectedVersion != -1 && eventStream[^1].Version != expectedVersion)
                 throw new ConcurrencyException();
             
+            //TBI: Add transaction scope for both saving data in DS and generating event in Kafka topic
             var version = expectedVersion;
             foreach (var @event in events)
             {
+                //persist each event to the store
                 @event.Version = ++version;
                 var eventType = @event.GetType().Name;
 
@@ -48,12 +55,16 @@ namespace Post.Cmd.Infrastructure.Stores
                     TimeStamp = DateTime.UtcNow,
                     AggregateID = aggregateId,
                     AggregateType = nameof(PostAggregate),
-                    Version = @event.Version,
+                    Version = @event.Version, //aggregate record version
                     EventType = eventType,
-                    Data = @event
+                    EventData = @event
                 };
 
                 await _eventStoreRepo.SaveAsync(eventModel);
+
+                //section:08
+                string topicName = Environment.GetEnvironmentVariable("KAFKA_TOPIC")?? "SocialMediaPostEvents";
+                await _eventProducer.ProduceAsync(topicName, @event);
             }
         }
     }

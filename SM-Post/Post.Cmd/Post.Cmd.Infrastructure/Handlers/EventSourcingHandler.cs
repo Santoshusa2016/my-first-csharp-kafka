@@ -12,6 +12,8 @@ namespace Post.Cmd.Infrastructure.Handlers
 {
     public class EventSourcingHandler : IEventSourcingHandler<PostAggregate>
     {
+        //get & save aggregate object
+
         private readonly IEventStore _eventStore;
         public EventSourcingHandler(IEventStore eventStore)
         {
@@ -44,5 +46,6 @@ namespace Post.Cmd.Infrastructure.Handlers
             //after processing events mark changes as committed
             aggregate.MarkChangesAsCommitted();
         }
+
     }
 }

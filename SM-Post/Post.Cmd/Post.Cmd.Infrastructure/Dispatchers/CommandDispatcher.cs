@@ -19,12 +19,15 @@ namespace Post.Cmd.Infrastructure.Dispatchers
             {
                 throw new InvalidOperationException("you cannot register same command handler twice");
             }
-            _handlers.Add(typeof(T), 
-                x => handler((T)x)); //cast x(basecommand) to concrete type
+            _handlers.Add(
+                typeof(T), 
+                x => handler((T)x)//cast x(basecommand) to concrete type required
+                ); 
         }
 
         public async Task SendAsync(BaseCommand command)
         {
+            //on every new command raised, the handler will call app commandHandler method
             if (_handlers.TryGetValue(command.GetType(), out Func<BaseCommand, Task> handler))
             {
                 await handler.Invoke(command);

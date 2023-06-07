@@ -1,11 +1,13 @@
-using CQRS.Core.Domain;
+using Confluent.Kafka;
 using CQRS.Core.Handlers;
 using CQRS.Core.Infrastructure;
+using CQRS.Core.Producers;
 using Post.Cmd.Api.Commands;
 using Post.Cmd.Domain.Aggregates;
 using Post.Cmd.Infrastructure.Config;
 using Post.Cmd.Infrastructure.Dispatchers;
 using Post.Cmd.Infrastructure.Handlers;
+using Post.Cmd.Infrastructure.Producers;
 using Post.Cmd.Infrastructure.Respositories;
 using Post.Cmd.Infrastructure.Stores;
 
@@ -20,12 +22,16 @@ builder.Services.AddSwaggerGen();
 
 //sec6:EventStore
 builder.Services.Configure<MongoDbConfig>(builder.Configuration.GetSection(nameof(MongoDbConfig)));
+builder.Services.Configure<ProducerConfig>(builder.Configuration.GetSection(nameof(ProducerConfig)));
+
 builder.Services.AddScoped<IEventStoreRepository, EventStoreRepository>();
+builder.Services.AddScoped<IEventProducer, EventProducer>();
 builder.Services.AddScoped<IEventStore, EventStore>();
 
 //sec7: command handling with Mediator pattern
 builder.Services.AddScoped<IEventSourcingHandler<PostAggregate>, EventSourcingHandler>();
 builder.Services.AddScoped<ICommandHandler, CommandHandler>();
+
 
 //register command handler methods in ICommandDispatcher
 var commandHandler = builder.Services.BuildServiceProvider().GetRequiredService<ICommandHandler>();
@@ -37,6 +43,7 @@ dispatcher.RegisterHandler<AddCommentCommand>(commandHandler.HandleAsync);
 dispatcher.RegisterHandler<EditCommentCommand>(commandHandler.HandleAsync);
 dispatcher.RegisterHandler<RemoveCommentCommand>(commandHandler.HandleAsync);
 dispatcher.RegisterHandler<DeletePostCommand>(commandHandler.HandleAsync);
+
 builder.Services.AddSingleton<ICommandDispatcher>(_ => dispatcher); //register dispatcher as singleton
 
 var app = builder.Build();

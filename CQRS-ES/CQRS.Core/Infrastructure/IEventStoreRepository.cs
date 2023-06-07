@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CQRS.Core.Domain
+namespace CQRS.Core.Infrastructure
 {
     //repository pattern
     public interface IEventStoreRepository

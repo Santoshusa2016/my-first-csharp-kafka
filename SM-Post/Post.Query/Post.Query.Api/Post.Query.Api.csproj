@@ -7,14 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.16" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.16" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\CQRS-ES\CQRS.Core\CQRS.Core.csproj" />
-    <ProjectReference Include="..\..\Post.Cmd\Post.Cmd.Domain\Post.Cmd.Domain.csproj" />
-    <ProjectReference Include="..\..\Post.Cmd\Post.Cmd.Infrastructure\Post.Cmd.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Post.Common\Post.Common.csproj" />
+    <ProjectReference Include="..\Post.Query.Domain\Post.Query.Domain.csproj" />
+    <ProjectReference Include="..\Post.Query.Infrastructure\Post.Query.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
-﻿using CQRS.Core.Domain;
-using CQRS.Core.Events;
+﻿using CQRS.Core.Events;
+using CQRS.Core.Infrastructure;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Post.Cmd.Infrastructure.Config;
@@ -20,14 +20,15 @@ namespace Post.Cmd.Infrastructure.Respositories
             var mongoDB = mongoClient.GetDatabase(config.Value.Database);
             _eventStoreCollection = mongoDB.GetCollection<EventModel>(config.Value.Collection);
         }
+
         public async Task<List<EventModel>> FindByAggregateID(Guid aggregateId)
         {
-            return await _eventStoreCollection.Find(x => x.AggregateID == aggregateId).ToListAsync().ConfigureAwait(false);   
+            return await _eventStoreCollection.Find(x => x.AggregateID == aggregateId).ToListAsync().ConfigureAwait(continueOnCapturedContext: false);   
         }
 
         public async Task SaveAsync(EventModel @event)
         {
-            await _eventStoreCollection.InsertOneAsync(@event).ConfigureAwait(false);
+            await _eventStoreCollection.InsertOneAsync(@event).ConfigureAwait(continueOnCapturedContext: false);
         }
     }
 }

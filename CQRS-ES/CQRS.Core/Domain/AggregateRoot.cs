@@ -13,7 +13,7 @@ namespace CQRS.Core.Domain
 
         public int Version { get; set; } = -1;
 
-        //events are used to make state changes to aggregate domain obj
+        //events are used to make state changes to aggregate
         private readonly List<BaseEvent> _changes = new();
         
         public IEnumerable<BaseEvent> GetUncommittedEvents() => _changes;
