@@ -1,5 +1,11 @@
+using Confluent.Kafka;
+using CQRS.Core.Consumer;
 using Microsoft.EntityFrameworkCore;
+using Post.Query.Domain.Repository;
+using Post.Query.Infrastructure.Consumer;
 using Post.Query.Infrastructure.DataAccess;
+using Post.Query.Infrastructure.Handlers;
+using Post.Query.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +18,21 @@ builder.Services.AddSingleton<DatabaseContextFactory>(new DatabaseContextFactory
 var dataContext = builder.Services.BuildServiceProvider().GetRequiredService<DatabaseContext>();
 dataContext.Database.EnsureCreated();
 
+//sect11:52 - register repository <<check order of services added>>
+builder.Services.AddScoped<IPostRepository, PostRespository>();
+builder.Services.AddScoped<ICommentRepository, CommentRespository>();
+builder.Services.AddScoped<IEventHandler, Post.Query.Infrastructure.Handlers.EventHandler>();
 
-builder.Services.AddControllers();
+//sect12:56 - Event consumer
+builder.Services.Configure<ConsumerConfig>(builder.Configuration.GetSection(nameof(ConsumerConfig)));
+builder.Services.AddScoped<IEventConsumer, EventConsumer>();
+
+
+
+//sect12:57 ConsumerHosted background service
+builder.Services.AddHostedService<ConsumerHostedService>(); //this will call StartAsync method on startup of api
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

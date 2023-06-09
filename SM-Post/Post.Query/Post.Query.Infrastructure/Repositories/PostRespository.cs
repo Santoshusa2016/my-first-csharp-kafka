@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Post.Query.Infrastructure.Repositories
 {
-    internal class PostRespository : IPostRepository
+    public class PostRespository : IPostRepository
     {
         private readonly DatabaseContextFactory _dbContextFactory;
         public PostRespository(DatabaseContextFactory databaseContextFactory)
