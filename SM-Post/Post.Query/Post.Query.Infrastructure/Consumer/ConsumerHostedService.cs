@@ -24,7 +24,7 @@ namespace Post.Query.Infrastructure.Consumer
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Event consumer service running");
+            _logger.LogInformation("Event consumer background service running");
             using (IServiceScope scope = _serviceProvider.CreateScope())
             {
                 var eventConsumer = scope.ServiceProvider.GetRequiredService<IEventConsumer>();
@@ -37,7 +37,7 @@ namespace Post.Query.Infrastructure.Consumer
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Event consumer service stopped");
+            _logger.LogInformation("Event consumer background service stopped");
             return Task.CompletedTask;
         }
     }

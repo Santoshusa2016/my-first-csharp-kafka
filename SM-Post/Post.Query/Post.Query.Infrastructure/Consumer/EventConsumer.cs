@@ -44,7 +44,7 @@ namespace Post.Query.Infrastructure.Consumer
 
                 var options = new JsonSerializerOptions
                 {
-                    Converters = { new EventJSONConvertor()}
+                    Converters = { new EventJSONConverter()}
                 };
 
                 //get concrete socialMedia Post event

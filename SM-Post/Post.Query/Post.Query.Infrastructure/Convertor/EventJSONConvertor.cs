@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Post.Query.Infrastructure.Convertor
 {
-    public class EventJSONConvertor : JsonConverter<BaseEvent>
+    public class EventJSONConverter : JsonConverter<BaseEvent>
     {
         public override bool CanConvert(Type typeToConvert)
         {

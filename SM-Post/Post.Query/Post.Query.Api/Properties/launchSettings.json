@@ -16,7 +16,8 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_URLS": "http://localhost:5011"
+        "ASPNETCORE_URLS": "http://localhost:5011",
+        "KAFKA_TOPIC": "SocialMediaPostEvents"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7030;http://localhost:5277"

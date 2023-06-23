@@ -18,10 +18,15 @@ builder.Services.AddSingleton<DatabaseContextFactory>(new DatabaseContextFactory
 var dataContext = builder.Services.BuildServiceProvider().GetRequiredService<DatabaseContext>();
 dataContext.Database.EnsureCreated();
 
+
+
+
 //sect11:52 - register repository <<check order of services added>>
 builder.Services.AddScoped<IPostRepository, PostRespository>();
 builder.Services.AddScoped<ICommentRepository, CommentRespository>();
 builder.Services.AddScoped<IEventHandler, Post.Query.Infrastructure.Handlers.EventHandler>();
+
+
 
 //sect12:56 - Event consumer
 builder.Services.Configure<ConsumerConfig>(builder.Configuration.GetSection(nameof(ConsumerConfig)));
@@ -48,8 +53,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+//app.UseAuthorization();
 
-app.MapControllers();
+//app.MapControllers();
 
 app.Run();
