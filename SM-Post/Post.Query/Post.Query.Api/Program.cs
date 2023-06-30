@@ -1,9 +1,13 @@
 using Confluent.Kafka;
 using CQRS.Core.Consumer;
+using CQRS.Core.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Post.Query.Api.Queries;
+using Post.Query.Domain.Entities;
 using Post.Query.Domain.Repository;
 using Post.Query.Infrastructure.Consumer;
 using Post.Query.Infrastructure.DataAccess;
+using Post.Query.Infrastructure.Dispatchers;
 using Post.Query.Infrastructure.Handlers;
 using Post.Query.Infrastructure.Repositories;
 
@@ -24,8 +28,20 @@ dataContext.Database.EnsureCreated();
 //sect11:52 - register repository <<check order of services added>>
 builder.Services.AddScoped<IPostRepository, PostRespository>();
 builder.Services.AddScoped<ICommentRepository, CommentRespository>();
+builder.Services.AddScoped<IQueryHandler, QueryHandler>();
 builder.Services.AddScoped<IEventHandler, Post.Query.Infrastructure.Handlers.EventHandler>();
 
+
+//sect15: register query Handlers
+var queryHandler = builder.Services.BuildServiceProvider().GetRequiredService<IQueryHandler>();
+var queryDispatcher = new QueryDispatcher();
+queryDispatcher.RegisterHandler<FindAllPostQuery>(queryHandler.HandleAsync);
+queryDispatcher.RegisterHandler<FindPostByIdQuery>(queryHandler.HandleAsync);
+queryDispatcher.RegisterHandler<FindPostByAuthorQuery>(queryHandler.HandleAsync);
+queryDispatcher.RegisterHandler<FindPostWithCommentQuery>(queryHandler.HandleAsync);
+queryDispatcher.RegisterHandler<FindPostWithLikeQuery>(queryHandler.HandleAsync);
+//register singleton query dispatcher - we want to register queryhandler only once
+builder.Services.AddSingleton<IQueryDispatcher<PostEntity>>(_ => queryDispatcher);
 
 
 //sect12:56 - Event consumer
@@ -36,6 +52,8 @@ builder.Services.AddScoped<IEventConsumer, EventConsumer>();
 
 //sect12:57 ConsumerHosted background service
 builder.Services.AddHostedService<ConsumerHostedService>(); //this will call StartAsync method on startup of api
+
+
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
