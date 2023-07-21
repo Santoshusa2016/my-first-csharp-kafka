@@ -10,5 +10,7 @@
         Task HandleAsync(NewPostCommand command);
         Task HandleAsync(RemoveCommentCommand command);
 
+        Task HandleAsync(RestoreReadDBCommand command); //sect17:88
+
     }
 }

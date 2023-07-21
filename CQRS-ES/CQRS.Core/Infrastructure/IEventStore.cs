@@ -11,7 +11,9 @@ namespace CQRS.Core.Infrastructure
     {
         //interface for eventstore business logic
         Task SaveEventsAsync(Guid aggregateId, IEnumerable<BaseEvent> events, int expectedVersion);
-        Task<List<BaseEvent>> GetEventsAsync(Guid aggregateId);  
+        Task<List<BaseEvent>> GetEventsAsync(Guid aggregateId);
+
+        Task<List<Guid>> GetAggegateIDsAsync();
             
     }
 }

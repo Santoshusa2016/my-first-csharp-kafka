@@ -23,6 +23,7 @@ namespace Post.Cmd.Infrastructure.Stores
             _eventStoreRepo = eventStoreRepo;
             _eventProducer = eventProducer;
         }
+
         public async Task<List<BaseEvent>> GetEventsAsync(Guid aggregateId)
         {
             //get events for replaying
@@ -66,6 +67,16 @@ namespace Post.Cmd.Infrastructure.Stores
                 string topicName = Environment.GetEnvironmentVariable("KAFKA_TOPIC")?? "SocialMediaPostEvents";
                 await _eventProducer.ProduceAsync(topicName, @event);
             }
+        }
+
+
+        public async Task<List<Guid>> GetAggegateIDsAsync()
+        {
+            var eventStream = await _eventStoreRepo.FindAllAsync();
+            if (eventStream == null || eventStream.Any())
+                throw new ArgumentNullException(nameof(eventStream), "could not retrieve event stream");
+
+            return eventStream.Select(x => x.AggregateID).Distinct().ToList();
         }
     }
 }

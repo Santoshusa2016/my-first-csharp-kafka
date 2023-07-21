@@ -18,6 +18,8 @@ namespace Post.Cmd.Domain.Aggregates
         private string _author;
 
         private Dictionary<Guid, Tuple<string, string>> _comments = new();
+        public bool Active { get => _active; set => _active = value; }
+
 
         public PostAggregate()
         {
